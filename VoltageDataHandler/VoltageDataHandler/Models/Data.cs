@@ -17,5 +17,5 @@ namespace VoltageDataHandler.Models
         public float Mean5 { get; set;}
         public float Mean6 { get; set;}
     }
-    }
+    
 }
