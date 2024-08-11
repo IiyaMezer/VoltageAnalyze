@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VoltageDataHandler.Models
+namespace VoltageDataHandler.Models;
+
+public class Subtable
 {
-    internal class Subtable
+    public string Name { get; set; }
+    public List<Measurement> Measurements { get; set; } = new List<Measurement>();
+
+
+    public Subtable(string Name) 
     {
-        public string Name { get; set; }
-        public List<Measurement> Measurements { get; set; } = new List<Measurement>();
-
-
-        public Subtable(string Name) 
-        {
-            this.Name = Name;
-        }
+        this.Name = Name;
     }
 }
