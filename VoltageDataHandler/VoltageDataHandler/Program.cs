@@ -17,7 +17,9 @@ namespace VoltageDataHandler
 
             var headlessData = DataHandler.DeleteHeader(data);
             
-            DataHandler.ParseData(headlessData);
+            var subtables = DataHandler.ParseData(headlessData);
+
+            var finalData = DataHandler.CalculateAverages(subtables);
 
 
             stopwatch.Stop();

@@ -36,7 +36,9 @@ public static class DataHandler
             {
                 var parts = line.Split('/');
                 int sec = int.Parse(parts[0]);
-                double[] voltage = parts.Skip(1).Select(double.Parse).ToArray();
+                double[] voltage = parts.Skip(1)
+                     .Select(s => double.Parse(s, System.Globalization.CultureInfo.InvariantCulture))
+                     .ToArray();
 
                 if (currentSubtable != null)
                 {
@@ -51,6 +53,41 @@ public static class DataHandler
         }
 
         return subtables;
+    }
+
+    public static List<AvgSubtable> CalculateAverages(List<Subtable> subtables)
+    {
+        List<AvgSubtable> result = new();
+
+        foreach (Subtable subtable in subtables)
+        {
+            if(subtable.Measurements.Count == 0)
+            {
+                continue;
+            }
+
+            var avgData = new List<double>();
+
+            double[] sumData = new double[subtable.Measurements[0].Data.Length];
+
+            foreach(Measurement measurement in subtable.Measurements)
+            {
+                for(int i = 0; i < sumData.Length; i++)
+                {
+                    sumData[i] = measurement.Data[i];
+                }
+            }
+
+            for(int i = 0;i < sumData.Length; i++)
+            {
+                avgData.Add(Math.Round(sumData[i] / subtable.Measurements.Count, 3));
+            }
+            AvgSubtable avgSubtable = new(subtable.Name, avgData.ToArray());
+            result.Add(avgSubtable);
+
+        }
+
+        return result;
     }
 
 
