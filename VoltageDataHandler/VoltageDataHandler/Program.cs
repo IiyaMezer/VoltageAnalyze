@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.AccessControl;
 using VoltageDataHandler.DataHandlers;
 using VoltageDataHandler.FileHandlers;
 using VoltageDataHandler.Models;
@@ -13,13 +14,24 @@ namespace VoltageDataHandler
             stopwatch.Start();
 
             var handler = new TxtFileHandler();
-            var data = handler.ReadFiles("C:/Users/carna/source/repos/IiyaMezer/VoltageAnalyze/VoltageDataHandler/ZAP0138.TXT");
+
+            Console.WriteLine("Введите полный путь файла:");
+            string filepath = Console.ReadLine();
+            var data = handler.ReadFiles(filepath);
 
             var headlessData = DataHandler.DeleteHeader(data);
             
             var subtables = DataHandler.ParseData(headlessData);
 
             var finalData = DataHandler.CalculateAverages(subtables);
+
+            CsvFileHandler csvFileHandler = new CsvFileHandler();
+
+            string trimmedPath = filepath.Substring(0, filepath.Length - 3);
+            string newPath = trimmedPath + "csv";
+
+
+            csvFileHandler.WriteFiles(newPath, finalData);
 
 
             stopwatch.Stop();

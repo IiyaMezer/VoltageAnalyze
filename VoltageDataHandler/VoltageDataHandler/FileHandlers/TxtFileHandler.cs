@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VoltageDataHandler.Interfaces;
+using VoltageDataHandler.Models;
 
 namespace VoltageDataHandler.FileHandlers
 {
@@ -20,7 +21,7 @@ namespace VoltageDataHandler.FileHandlers
             return data;
         }
 
-        public void WriteFiles(string filePath, List<string> files)
+        public void WriteFiles(string filePath, List<AvgSubtable> data)
         {
             throw new NotImplementedException();
         }
