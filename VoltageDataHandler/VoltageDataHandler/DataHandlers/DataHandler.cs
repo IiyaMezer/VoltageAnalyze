@@ -14,7 +14,7 @@ public static class DataHandler
 
     public static List<Subtable> ParseData(List<string> rawData)
     {
-        List<Subtable> subtables = new List<Subtable>();
+        List<Subtable> subtables = [];
 
         Subtable currentSubtable = null;
 
@@ -28,7 +28,7 @@ public static class DataHandler
                     currentSubtable = null;
                 }
             }
-            else if (line.Contains(":")) 
+            else if (line.Contains(':')) 
             {
                 currentSubtable = new Subtable(line.Trim());
             }
@@ -38,7 +38,7 @@ public static class DataHandler
                 int sec = int.Parse(parts[0]);
                 double[] voltage = parts.Skip(1).Select(double.Parse).ToArray();
 
-                if(currentSubtable != null)
+                if (currentSubtable != null)
                 {
                     currentSubtable.Measurements.Add(new Measurement(sec, voltage));
                 }

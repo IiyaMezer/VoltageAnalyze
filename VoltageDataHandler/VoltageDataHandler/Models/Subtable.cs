@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace VoltageDataHandler.Models;
 
-public class Subtable
+public class Subtable(string Name)
 {
-    public string Name { get; set; }
-    public List<Measurement> Measurements { get; set; } = new List<Measurement>();
-
-
-    public Subtable(string Name) 
-    {
-        this.Name = Name;
-    }
+    public string Name { get; set; } = Name;
+    public List<Measurement> Measurements { get; set; } = [];
 }

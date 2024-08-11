@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace VoltageDataHandler.Models;
 
-public class Measurement
+public class Measurement(int sec, double[] data)
 {
-    public int Sec {  get; set; }
-    public double[] Data { get; set; }
-
-    public Measurement(int sec, double[] data)
-    {
-        Sec = sec;
-        Data = data;
-    }
+    public int Sec { get; set; } = sec;
+    public double[] Data { get; set; } = data;
 }
