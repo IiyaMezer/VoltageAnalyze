@@ -74,7 +74,7 @@ public static class DataHandler
             {
                 for(int i = 0; i < sumData.Length; i++)
                 {
-                    sumData[i] = measurement.Data[i];
+                    sumData[i] += measurement.Data[i];
                 }
             }
 
