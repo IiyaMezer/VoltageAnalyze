@@ -14,43 +14,49 @@ namespace VoltageDataHandler
 
             while (true)
             {
-                Console.WriteLine("Введите полный путь файла (или 'Exit' для выхода):");
-                string filepath = Console.ReadLine();
+                Console.WriteLine("Введите полный путь к папке (или 'Exit' для выхода):");
+                string directoryPath = Console.ReadLine();
 
-                if (string.Equals(filepath, "Exit", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(directoryPath, "Exit", StringComparison.OrdinalIgnoreCase))
                 {
                     break; // Выход из цикла
                 }
 
                 // Удаление кавычек в начале и в конце
-                filepath = filepath?.Trim('\"');
+                directoryPath = directoryPath?.Trim('\"');
 
-                // Проверка существования файла
-                if (!File.Exists(filepath))
+                // Проверка существования папки
+                if (!Directory.Exists(directoryPath))
                 {
-                    Console.WriteLine("Файл не найден. Проверьте путь.");
+                    Console.WriteLine("Папка не найдена. Проверьте путь.");
                     continue; // Возврат в начало цикла
                 }
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                var data = handler.ReadFiles(filepath);
-                Console.WriteLine($"Считано {data.Count} строк из файла.");
+                // Получение всех текстовых файлов в папке
+                string[] files = Directory.GetFiles(directoryPath, "*.txt");
 
-                var headlessData = DataHandler.DeleteHeader(data);
-                var subtables = DataHandler.ParseData(headlessData);
-                Console.WriteLine($"Обработано {subtables.Count} подтаблиц.");
+                foreach (var filepath in files)
+                {
+                    var data = handler.ReadFiles(filepath);
+                    Console.WriteLine($"Считано {data.Count} строк из файла: {Path.GetFileName(filepath)}.");
 
-                var finalData = DataHandler.CalculateAverages(subtables);
+                    var headlessData = DataHandler.DeleteHeader(data);
+                    var subtables = DataHandler.ParseData(headlessData);
+                    Console.WriteLine($"Обработано {subtables.Count} подтаблиц из файла: {Path.GetFileName(filepath)}.");
 
-                CsvFileHandler csvFileHandler = new CsvFileHandler();
+                    var finalData = DataHandler.CalculateAverages(subtables);
 
-                // Изменение расширения файла
-                string newPath = Path.ChangeExtension(filepath, ".csv");
+                    CsvFileHandler csvFileHandler = new CsvFileHandler();
 
-                csvFileHandler.WriteFiles(newPath, finalData);
-                Console.WriteLine($"Данные записаны в {newPath}.");
+                    // Изменение расширения файла
+                    string newPath = Path.ChangeExtension(filepath, ".csv");
+
+                    csvFileHandler.WriteFiles(newPath, finalData);
+                    Console.WriteLine($"Данные записаны в {newPath}.");
+                }
 
                 stopwatch.Stop();
                 Console.WriteLine($"Время выполнения: {stopwatch.Elapsed.TotalMilliseconds} ms");
