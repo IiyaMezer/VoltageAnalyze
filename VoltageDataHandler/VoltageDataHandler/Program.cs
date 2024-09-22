@@ -10,33 +10,51 @@ namespace VoltageDataHandler
     {
         static void Main(string[] args)
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
             var handler = new TxtFileHandler();
 
-            Console.WriteLine("Введите полный путь файла:");
-            string filepath = Console.ReadLine();
-            var data = handler.ReadFiles(filepath);
+            while (true)
+            {
+                Console.WriteLine("Введите полный путь файла (или 'Exit' для выхода):");
+                string filepath = Console.ReadLine();
 
-            var headlessData = DataHandler.DeleteHeader(data);
-            
-            var subtables = DataHandler.ParseData(headlessData);
+                if (string.Equals(filepath, "Exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    break; // Выход из цикла
+                }
 
-            var finalData = DataHandler.CalculateAverages(subtables);
+                // Удаление кавычек в начале и в конце
+                filepath = filepath?.Trim('\"');
 
-            CsvFileHandler csvFileHandler = new CsvFileHandler();
+                // Проверка существования файла
+                if (!File.Exists(filepath))
+                {
+                    Console.WriteLine("Файл не найден. Проверьте путь.");
+                    continue; // Возврат в начало цикла
+                }
 
-            string trimmedPath = filepath.Substring(0, filepath.Length - 3);
-            string newPath = trimmedPath + "csv";
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
 
+                var data = handler.ReadFiles(filepath);
+                Console.WriteLine($"Считано {data.Count} строк из файла.");
 
-            csvFileHandler.WriteFiles(newPath, finalData);
+                var headlessData = DataHandler.DeleteHeader(data);
+                var subtables = DataHandler.ParseData(headlessData);
+                Console.WriteLine($"Обработано {subtables.Count} подтаблиц.");
 
+                var finalData = DataHandler.CalculateAverages(subtables);
 
-            stopwatch.Stop();
-            Console.WriteLine(stopwatch.Elapsed.TotalMilliseconds);
-            Console.ReadLine();
+                CsvFileHandler csvFileHandler = new CsvFileHandler();
+
+                // Изменение расширения файла
+                string newPath = Path.ChangeExtension(filepath, ".csv");
+
+                csvFileHandler.WriteFiles(newPath, finalData);
+                Console.WriteLine($"Данные записаны в {newPath}.");
+
+                stopwatch.Stop();
+                Console.WriteLine($"Время выполнения: {stopwatch.Elapsed.TotalMilliseconds} ms");
+            }
         }
     }
 }
