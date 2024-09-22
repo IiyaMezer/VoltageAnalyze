@@ -35,8 +35,8 @@ namespace VoltageDataHandler
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                // Получение всех текстовых файлов в папке
-                string[] files = Directory.GetFiles(directoryPath, "*.txt");
+                // Получение всех текстовых файлов в папке и подпапках
+                string[] files = Directory.GetFiles(directoryPath, "*.txt", SearchOption.AllDirectories);
 
                 foreach (var filepath in files)
                 {
