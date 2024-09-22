@@ -14,53 +14,65 @@ namespace VoltageDataHandler
 
             while (true)
             {
-                Console.WriteLine("Введите полный путь к папке (или 'Exit' для выхода):");
-                string directoryPath = Console.ReadLine();
+                Console.WriteLine("Введите полный путь к файлу или папке (или 'Exit' для выхода):");
+                string inputPath = Console.ReadLine();
 
-                if (string.Equals(directoryPath, "Exit", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(inputPath, "Exit", StringComparison.OrdinalIgnoreCase))
                 {
                     break; // Выход из цикла
                 }
 
                 // Удаление кавычек в начале и в конце
-                directoryPath = directoryPath?.Trim('\"');
+                inputPath = inputPath?.Trim('\"');
 
-                // Проверка существования папки
-                if (!Directory.Exists(directoryPath))
+                // Проверка существования файла или папки
+                if (File.Exists(inputPath))
                 {
-                    Console.WriteLine("Папка не найдена. Проверьте путь.");
-                    continue; // Возврат в начало цикла
+                    // Обработка одного файла
+                    ProcessFile(handler, inputPath);
                 }
-
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                // Получение всех текстовых файлов в папке и подпапках
-                string[] files = Directory.GetFiles(directoryPath, "*.txt", SearchOption.AllDirectories);
-
-                foreach (var filepath in files)
+                else if (Directory.Exists(inputPath))
                 {
-                    var data = handler.ReadFiles(filepath);
-                    Console.WriteLine($"Считано {data.Count} строк из файла: {Path.GetFileName(filepath)}.");
+                    // Обработка всех файлов в папке и подпапках
+                    var stopwatch = new Stopwatch();
+                    stopwatch.Start();
 
-                    var headlessData = DataHandler.DeleteHeader(data);
-                    var subtables = DataHandler.ParseData(headlessData);
-                    Console.WriteLine($"Обработано {subtables.Count} подтаблиц из файла: {Path.GetFileName(filepath)}.");
+                    string[] files = Directory.GetFiles(inputPath, "*.txt", SearchOption.AllDirectories);
 
-                    var finalData = DataHandler.CalculateAverages(subtables);
+                    foreach (var filepath in files)
+                    {
+                        ProcessFile(handler, filepath);
+                    }
 
-                    CsvFileHandler csvFileHandler = new CsvFileHandler();
-
-                    // Изменение расширения файла
-                    string newPath = Path.ChangeExtension(filepath, ".csv");
-
-                    csvFileHandler.WriteFiles(newPath, finalData);
-                    Console.WriteLine($"Данные записаны в {newPath}.");
+                    stopwatch.Stop();
+                    Console.WriteLine($"Время выполнения: {stopwatch.Elapsed.TotalMilliseconds} ms");
                 }
-
-                stopwatch.Stop();
-                Console.WriteLine($"Время выполнения: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                else
+                {
+                    Console.WriteLine("Файл или папка не найдены. Проверьте путь.");
+                }
             }
+        }
+
+        private static void ProcessFile(TxtFileHandler handler, string filepath)
+        {
+            var data = handler.ReadFiles(filepath);
+            Console.WriteLine($"Считано {data.Count} строк из файла: {Path.GetFileName(filepath)}.");
+
+            var headlessData = DataHandler.DeleteHeader(data);
+            var subtables = DataHandler.ParseData(headlessData);
+            Console.WriteLine($"Обработано {subtables.Count} подтаблиц из файла: {Path.GetFileName(filepath)}.");
+
+            var finalData = DataHandler.CalculateAverages(subtables);
+
+            CsvFileHandler csvFileHandler = new CsvFileHandler();
+
+            // Изменение расширения файла
+            string newPath = Path.ChangeExtension(filepath, ".csv");
+
+            csvFileHandler.WriteFiles(newPath, finalData);
+            Console.WriteLine($"Данные записаны в {newPath}.");
         }
     }
 }
+
